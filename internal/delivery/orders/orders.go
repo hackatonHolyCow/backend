@@ -1,0 +1,53 @@
+package orders
+
+import (
+	"hackathon/backend/entity"
+	"hackathon/backend/internal/service"
+	"hackathon/backend/pkg/errors"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+type OrdersDelivery struct {
+	service *service.Service
+}
+
+func New(svc *service.Service, router *gin.RouterGroup) {
+	delivery := &OrdersDelivery{
+		service: svc,
+	}
+
+	route := router.Group("/orders")
+	delivery.Create(route)
+}
+
+func (o *OrdersDelivery) Create(route *gin.RouterGroup) {
+	route.POST("", func(c *gin.Context) {
+		var request entity.Order
+		if err := c.Bind(&request); err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"err,or": gin.H{
+					"code":  http.StatusUnprocessableEntity,
+					"error": err.Error(),
+				},
+			})
+
+			return
+		}
+
+		response, err := o.service.Orders.Create(c, &request)
+		if err != nil {
+			c.JSON(errors.HTTPCode(err), gin.H{
+				"err,or": gin.H{
+					"code":  errors.HTTPCode(err),
+					"error": err.Error(),
+				},
+			})
+
+			return
+		}
+
+		c.JSON(http.StatusOK, response)
+	})
+}
