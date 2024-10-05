@@ -11,7 +11,7 @@ const (
 type Order struct {
 	ID          string     `json:"id" db:"id"`
 	State       OrderState `json:"state" db:"state"`
-	TotalAmount string     `json:"totalAmount" db:"totalAmount"`
+	TotalAmount int        `json:"totalAmount" db:"total_amount"`
 	Table       string     `json:"table" db:"table"`
 }
 type OrderItem struct {
