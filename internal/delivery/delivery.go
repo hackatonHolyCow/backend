@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"hackathon/backend/internal/delivery/items"
 	"hackathon/backend/internal/delivery/orders"
 	"hackathon/backend/internal/service"
 
@@ -11,5 +12,6 @@ func New(svc *service.Service) *gin.Engine {
 	app := gin.Default()
 	apiRouter := app.Group("/api/v1")
 	orders.New(svc, apiRouter)
+	items.New(svc, apiRouter)
 	return app
 }
