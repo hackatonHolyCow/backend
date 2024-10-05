@@ -9,11 +9,10 @@ const (
 )
 
 type Order struct {
-	ID          string       `json:"id" db:"id"`
-	State       OrderState   `json:"state" db:"state"`
-	TotalAmount string       `json:"totalAmount" db:"totalAmount"`
-	Items       []*OrderItem `json:"items" db:"items_list"`
-	Table       string       `json:"table" db:"table"`
+	ID          string     `json:"id" db:"id"`
+	State       OrderState `json:"state" db:"state"`
+	TotalAmount int        `json:"totalAmount" db:"total_amount"`
+	Table       string     `json:"table" db:"table"`
 }
 type OrderItem struct {
 	ID       string `json:"id" db:"id"`
