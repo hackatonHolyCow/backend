@@ -22,6 +22,7 @@ func New(svc *service.Service, router *gin.RouterGroup) {
 	delivery.Create(route)
 	delivery.Get(route)
 	delivery.List(route)
+	delivery.UpdateStatus(route)
 }
 
 func (o *OrdersDelivery) Create(route *gin.RouterGroup) {
@@ -87,5 +88,47 @@ func (o *OrdersDelivery) List(route *gin.RouterGroup) {
 		}
 
 		c.JSON(http.StatusOK, response)
+	})
+}
+
+func (o *OrdersDelivery) UpdateStatus(route *gin.RouterGroup) {
+	route.PATCH("/:id", func(c *gin.Context) {
+		var request entity.UpdateStatusRequest
+		if err := c.Bind(&request); err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"error": gin.H{
+					"code":  http.StatusUnprocessableEntity,
+					"error": err.Error(),
+				},
+			})
+
+			return
+		}
+
+		if request.Status == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": gin.H{
+					"code":  http.StatusBadRequest,
+					"error": "status is required",
+				},
+			})
+
+			return
+		}
+
+		if err := o.service.Orders.UpdateStatus(c, c.Param("id"), string(request.Status)); err != nil {
+			c.JSON(errors.HTTPCode(err), gin.H{
+				"error": gin.H{
+					"code":  errors.HTTPCode(err),
+					"error": err.Error(),
+				},
+			})
+
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "status updated",
+		})
 	})
 }

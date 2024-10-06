@@ -3,9 +3,9 @@ package entity
 import "github.com/mercadopago/sdk-go/pkg/payment"
 
 type OrderState string
-
 type Order struct {
 	ID          string         `json:"id" db:"id"`
+	Status      string         `json:"status" db:"status"`
 	TotalAmount int            `json:"totalAmount" db:"total_amount"`
 	Table       string         `json:"table" db:"board"`
 	Items       MenuItemsSlice `json:"items,omitempty" db:"items"`
@@ -25,4 +25,8 @@ type CreateOrderRequest struct {
 	Payment payment.Request `json:"payment"`
 	Table   string          `json:"table"`
 	Items   []OrderItem     `json:"items"`
+}
+
+type UpdateStatusRequest struct {
+	Status OrderState `json:"status"`
 }

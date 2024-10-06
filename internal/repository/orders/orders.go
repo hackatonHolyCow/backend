@@ -16,6 +16,7 @@ type OrdersRepository interface {
 	Create(ctx context.Context, order *entity.Order) (*entity.Order, error)
 	Get(ctx context.Context, id string) (*entity.Order, error)
 	List(ctx context.Context) ([]*entity.Order, error)
+	UpdateStatus(ctx context.Context, id, status string) error
 }
 
 type OrdersRepositoryIplm struct {
@@ -90,6 +91,7 @@ func (o *OrdersRepositoryIplm) List(ctx context.Context) ([]*entity.Order, error
 			`,
 		).
 		From(fmt.Sprintf("%s o", ordersSchema)).
+		Where(sq.Eq{"status": "pending"}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 
@@ -103,4 +105,29 @@ func (o *OrdersRepositoryIplm) List(ctx context.Context) ([]*entity.Order, error
 	}
 
 	return response, nil
+}
+
+func (o *OrdersRepositoryIplm) UpdateStatus(ctx context.Context, id, status string) error {
+	result, err := sq.
+		Update(ordersSchema).
+		Set("status", status).
+		Where(sq.Eq{"id": id}).
+		PlaceholderFormat(sq.Dollar).
+		RunWith(o.postgres).
+		ExecContext(ctx)
+
+	if err != nil {
+		return errors.Wrap(err, "orders: OrdersRepository.UpdateStatus sq.Update error")
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return errors.Wrap(err, "orders: OrdersRepository.UpdateStatus result.RowsAffected error")
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("orders: OrdersRepository.UpdateStatus no rows affected")
+	}
+
+	return nil
 }
