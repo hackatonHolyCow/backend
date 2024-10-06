@@ -6,15 +6,20 @@ import (
 	"hackathon/backend/entity"
 	"hackathon/backend/internal/repository"
 	"hackathon/backend/pkg/errors"
+	"io"
 
+	"github.com/google/uuid"
 	"github.com/mercadopago/sdk-go/pkg/config"
 	"github.com/mercadopago/sdk-go/pkg/payment"
+	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/option"
 )
 
 type OrdersService interface {
 	Create(ctx context.Context, order *entity.CreateOrderRequest) (*entity.Order, error)
 	Get(ctx context.Context, id string) (*entity.Order, error)
 	List(ctx context.Context) ([]*entity.Order, error)
+	TextToSpeach(ctx context.Context, text string) ([]byte, error)
 }
 
 type OrdersServiceImpl struct {
@@ -36,6 +41,7 @@ func (o *OrdersServiceImpl) Create(ctx context.Context, order *entity.CreateOrde
 		return nil, errors.Wrap(err, "orders: OrdersService.Create paymentClient.Create error")
 	}
 	response, err := o.repository.Orders.Create(ctx, &entity.Order{
+		ID:          uuid.NewString(),
 		TotalAmount: int(order.Payment.TransactionAmount),
 		Table:       order.Table,
 		PaymentID:   fmt.Sprint(paymentResponse.ID),
@@ -87,4 +93,27 @@ func (o *OrdersServiceImpl) List(ctx context.Context) ([]*entity.Order, error) {
 	}
 
 	return orders, nil
+}
+
+func (o *OrdersServiceImpl) TextToSpeach(ctx context.Context, text string) ([]byte, error) {
+	client := openai.NewClient(option.WithAPIKey("sk-6G8jjZyJXKDLbGelM1CCm_tPmIzrBMdjLCAh8O3RnbT3BlbkFJG5U2e61mJVJOWgV5tuRGid6WTFvdfDVlI0Tz1jbQcA"))
+	response, err := client.Audio.Speech.New(ctx, openai.AudioSpeechNewParams{
+		Model:          openai.F(openai.SpeechModelTTS1),
+		Input:          openai.String(text),
+		ResponseFormat: openai.F(openai.AudioSpeechNewParamsResponseFormatMP3),
+		Voice:          openai.F(openai.AudioSpeechNewParamsVoiceAlloy),
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "orders: OrdersService.textToSpeach client.Audio.Speech.New error")
+	}
+
+	defer response.Body.Close()
+
+	b, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "orders: OrdersService.textToSpeach io.ReadAll error")
+	}
+
+	return b, nil
 }

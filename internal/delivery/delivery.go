@@ -3,6 +3,7 @@ package delivery
 import (
 	"hackathon/backend/internal/delivery/items"
 	"hackathon/backend/internal/delivery/orders"
+	"hackathon/backend/internal/delivery/speech"
 	"hackathon/backend/internal/service"
 
 	"github.com/gin-contrib/cors"
@@ -21,5 +22,6 @@ func New(svc *service.Service) *gin.Engine {
 	apiRouter := app.Group("/api/v1")
 	orders.New(svc, apiRouter)
 	items.New(svc, apiRouter)
+	speech.New(svc, apiRouter)
 	return app
 }

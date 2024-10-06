@@ -12,6 +12,7 @@ type (
 		Application Application
 		Databases   Databases
 		MercadoPago MercadoPago
+		OpenAI      OpenAI
 	}
 
 	Application struct {
@@ -25,6 +26,10 @@ type (
 
 	MercadoPago struct {
 		Token string `env:"MP_ACCESS_TOKEN,required=true"`
+	}
+
+	OpenAI struct {
+		APIKey string `env:"OPENAI_API_KEY,required=true"`
 	}
 )
 

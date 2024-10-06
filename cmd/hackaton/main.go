@@ -11,6 +11,8 @@ import (
 
 	_ "github.com/lib/pq"
 	mpconfig "github.com/mercadopago/sdk-go/pkg/config"
+	"github.com/openai/openai-go"
+	"github.com/openai/openai-go/option"
 	"go.uber.org/zap"
 )
 
@@ -33,8 +35,10 @@ func main() {
 		logger.Sugar().Fatalf("failed to create new mercado config")
 	}
 
+	openAI := openai.NewClient(option.WithAPIKey(conf.OpenAI.APIKey))
+
 	repo := repository.New(psql)
-	svc := service.New(repo, *mpConf)
+	svc := service.New(repo, *mpConf, openAI)
 	app := delivery.New(svc)
 	app.Run(fmt.Sprintf(":%d", conf.Application.Port))
 }

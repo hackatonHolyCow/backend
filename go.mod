@@ -13,6 +13,14 @@ require (
 require github.com/gin-contrib/cors v1.7.2
 
 require (
+	github.com/openai/openai-go v0.1.0-alpha.25
+	github.com/tidwall/gjson v1.14.4 // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.1 // indirect
+	github.com/tidwall/sjson v1.2.5 // indirect
+)
+
+require (
 	github.com/ansel1/merry/v2 v2.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
