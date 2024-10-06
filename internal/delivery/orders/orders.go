@@ -24,10 +24,10 @@ func New(svc *service.Service, router *gin.RouterGroup) {
 
 func (o *OrdersDelivery) Create(route *gin.RouterGroup) {
 	route.POST("", func(c *gin.Context) {
-		var request entity.Order
+		var request entity.CreateOrderRequest
 		if err := c.Bind(&request); err != nil {
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"err,or": gin.H{
+				"error": gin.H{
 					"code":  http.StatusUnprocessableEntity,
 					"error": err.Error(),
 				},
@@ -39,7 +39,7 @@ func (o *OrdersDelivery) Create(route *gin.RouterGroup) {
 		response, err := o.service.Orders.Create(c, &request)
 		if err != nil {
 			c.JSON(errors.HTTPCode(err), gin.H{
-				"err,or": gin.H{
+				"error": gin.H{
 					"code":  errors.HTTPCode(err),
 					"error": err.Error(),
 				},

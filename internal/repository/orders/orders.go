@@ -28,8 +28,8 @@ func New(psql *sqlx.DB) OrdersRepository {
 func (o *OrdersRepositoryIplm) Create(ctx context.Context, order *entity.Order) (*entity.Order, error) {
 	query, args, err := sq.
 		Insert(ordersSchema).
-		Columns("state", "total_amount", "table").
-		Values(order.State, order.TotalAmount, order.Table).
+		Columns("total_amount", "board", "payment_id").
+		Values(order.TotalAmount, order.Table, order.PaymentID).
 		Suffix("RETURNING *").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -39,7 +39,7 @@ func (o *OrdersRepositoryIplm) Create(ctx context.Context, order *entity.Order) 
 	}
 
 	var response entity.Order
-	if err := o.postgres.QueryRowxContext(ctx, query, args...).StructScan(&order); err != nil {
+	if err := o.postgres.GetContext(ctx, &response, query, args...); err != nil {
 		return nil, errors.WithHTTPCode(errors.Wrap(err, "orders: OrdersRepository.Create postgres.QueryRowxContext error"), 500)
 	}
 
