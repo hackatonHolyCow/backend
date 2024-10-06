@@ -20,6 +20,7 @@ func New(svc *service.Service, router *gin.RouterGroup) {
 
 	route := router.Group("/orders")
 	delivery.Create(route)
+	delivery.Get(route)
 }
 
 func (o *OrdersDelivery) Create(route *gin.RouterGroup) {
@@ -37,6 +38,24 @@ func (o *OrdersDelivery) Create(route *gin.RouterGroup) {
 		}
 
 		response, err := o.service.Orders.Create(c, &request)
+		if err != nil {
+			c.JSON(errors.HTTPCode(err), gin.H{
+				"error": gin.H{
+					"code":  errors.HTTPCode(err),
+					"error": err.Error(),
+				},
+			})
+
+			return
+		}
+
+		c.JSON(http.StatusOK, response)
+	})
+}
+
+func (o *OrdersDelivery) Get(route *gin.RouterGroup) {
+	route.GET("/:id", func(c *gin.Context) {
+		response, err := o.service.Orders.Get(c, c.Param("id"))
 		if err != nil {
 			c.JSON(errors.HTTPCode(err), gin.H{
 				"error": gin.H{

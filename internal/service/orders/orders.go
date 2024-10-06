@@ -13,6 +13,7 @@ import (
 
 type OrdersService interface {
 	Create(ctx context.Context, order *entity.CreateOrderRequest) (*entity.Order, error)
+	Get(ctx context.Context, id string) (*entity.Order, error)
 }
 
 type OrdersServiceImpl struct {
@@ -62,4 +63,18 @@ func (o *OrdersServiceImpl) Create(ctx context.Context, order *entity.CreateOrde
 	}
 	response.Items = items
 	return response, nil
+}
+
+func (o *OrdersServiceImpl) Get(ctx context.Context, id string) (*entity.Order, error) {
+	order, err := o.repository.Orders.Get(ctx, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "orders: OrdersService.Get repository.Orders.Get error")
+	}
+
+	items, err := o.repository.Items.ListByOrderID(ctx, order.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "orders: OrdersService.Get repository.Items.List error")
+	}
+	order.Items = items
+	return order, nil
 }
