@@ -22,6 +22,7 @@ type OrderItem struct {
 }
 
 type CreateOrderRequest struct {
+	ID      string          `json:"id"`
 	Payment payment.Request `json:"payment"`
 	Table   string          `json:"table"`
 	Items   []OrderItem     `json:"items"`

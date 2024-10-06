@@ -83,6 +83,8 @@ func (o *OrdersRepositoryIplm) List(ctx context.Context) ([]*entity.Order, error
 						'price', i2.price,
 						'tags', i2.tags,
 						'picture', i2.picture
+						'quantity', oi2.quantity,
+						'comments', oi2.comments
 					))
 					FROM items i2
 					JOIN order_items oi2 ON i2.id = oi2.item_id

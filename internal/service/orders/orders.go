@@ -7,7 +7,6 @@ import (
 	"hackathon/backend/internal/repository"
 	"hackathon/backend/pkg/errors"
 
-	"github.com/google/uuid"
 	"github.com/mercadopago/sdk-go/pkg/config"
 	"github.com/mercadopago/sdk-go/pkg/payment"
 )
@@ -37,8 +36,9 @@ func (o *OrdersServiceImpl) Create(ctx context.Context, order *entity.CreateOrde
 	if err != nil {
 		return nil, errors.Wrap(err, "orders: OrdersService.Create paymentClient.Create error")
 	}
+
 	response, err := o.repository.Orders.Create(ctx, &entity.Order{
-		ID:          uuid.NewString(),
+		ID:          order.ID,
 		TotalAmount: int(order.Payment.TransactionAmount),
 		Table:       order.Table,
 		PaymentID:   fmt.Sprint(paymentResponse.ID),

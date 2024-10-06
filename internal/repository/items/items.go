@@ -48,7 +48,7 @@ func (i *ItemsRepositoryImpl) List(ctx context.Context) ([]*entity.MenuItem, err
 }
 
 func (i *ItemsRepositoryImpl) ListByOrderID(ctx context.Context, orderID string) ([]*entity.MenuItem, error) {
-	query, args, err := sq.Select("i.*").
+	query, args, err := sq.Select("i.*", "oi.comments", "oi.quantity").
 		From(fmt.Sprintf("%s i", itemsSchema)).
 		Join("order_items oi ON i.id = oi.item_id").
 		Where(sq.Eq{"oi.order_id": orderID}).
