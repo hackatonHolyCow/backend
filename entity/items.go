@@ -1,6 +1,10 @@
 package entity
 
-import "github.com/lib/pq"
+import (
+	"encoding/json"
+
+	"github.com/lib/pq"
+)
 
 type MenuItem struct {
 	ID          string         `json:"id" db:"id"`
@@ -9,4 +13,18 @@ type MenuItem struct {
 	Price       int            `json:"price" db:"price"`
 	Tags        pq.StringArray `json:"tags" db:"tags"`
 	Picture     string         `json:"picture" db:"picture"`
+}
+
+type MenuItemsSlice []*MenuItem
+
+func (m *MenuItemsSlice) Scan(src interface{}) error {
+	if src == nil {
+		return nil
+	}
+
+	if err := json.Unmarshal(src.([]byte), m); err != nil {
+		return err
+	}
+
+	return nil
 }

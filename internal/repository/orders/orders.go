@@ -2,6 +2,7 @@ package orders
 
 import (
 	"context"
+	"fmt"
 	"hackathon/backend/entity"
 	"hackathon/backend/pkg/errors"
 
@@ -14,6 +15,7 @@ const ordersSchema = "orders"
 type OrdersRepository interface {
 	Create(ctx context.Context, order *entity.Order) (*entity.Order, error)
 	Get(ctx context.Context, id string) (*entity.Order, error)
+	List(ctx context.Context) ([]*entity.Order, error)
 }
 
 type OrdersRepositoryIplm struct {
@@ -65,4 +67,40 @@ func (o *OrdersRepositoryIplm) Get(ctx context.Context, id string) (*entity.Orde
 	}
 
 	return &response, nil
+}
+
+func (o *OrdersRepositoryIplm) List(ctx context.Context) ([]*entity.Order, error) {
+	query, args, err := sq.
+		Select(
+			"o.*",
+			`
+				(
+					SELECT json_agg(json_build_object(
+						'id', i2.id,
+						'name', i2.name,
+						'description', i2.description,
+						'price', i2.price,
+						'tags', i2.tags,
+						'picture', i2.picture
+					))
+					FROM items i2
+					JOIN order_items oi2 ON i2.id = oi2.item_id
+					WHERE oi2.order_id = o.id
+				) AS items
+			`,
+		).
+		From(fmt.Sprintf("%s o", ordersSchema)).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		return nil, errors.WithHTTPCode(errors.Wrap(err, "orders: OrdersRepository.List sq.ToSql error"), 500)
+	}
+
+	response := make([]*entity.Order, 0)
+	if err := o.postgres.SelectContext(ctx, &response, query, args...); err != nil {
+		return nil, errors.WithHTTPCode(errors.Wrap(err, "orders: OrdersRepository.List postgres.Select error"), 500)
+	}
+
+	return response, nil
 }

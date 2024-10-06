@@ -5,11 +5,11 @@ import "github.com/mercadopago/sdk-go/pkg/payment"
 type OrderState string
 
 type Order struct {
-	ID          string      `json:"id" db:"id"`
-	TotalAmount int         `json:"totalAmount" db:"total_amount"`
-	Table       string      `json:"table" db:"board"`
-	Items       []*MenuItem `json:"items,omitempty" db:"-"`
-	PaymentID   string      `json:"paymentId" db:"payment_id"`
+	ID          string         `json:"id" db:"id"`
+	TotalAmount int            `json:"totalAmount" db:"total_amount"`
+	Table       string         `json:"table" db:"board"`
+	Items       MenuItemsSlice `json:"items,omitempty" db:"items"`
+	PaymentID   string         `json:"paymentId" db:"payment_id"`
 }
 
 type OrderItem struct {
