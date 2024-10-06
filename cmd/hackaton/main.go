@@ -10,6 +10,7 @@ import (
 	"hackathon/backend/pkg/postgres"
 
 	_ "github.com/lib/pq"
+	mpconfig "github.com/mercadopago/sdk-go/pkg/config"
 	"go.uber.org/zap"
 )
 
@@ -27,8 +28,13 @@ func main() {
 
 	defer psql.Close()
 
+	mpConf, err := mpconfig.New(conf.MercadoPago.Token)
+	if err != nil {
+		logger.Sugar().Fatalf("failed to create new mercado config")
+	}
+
 	repo := repository.New(psql)
-	svc := service.New(repo)
+	svc := service.New(repo, *mpConf)
 	app := delivery.New(svc)
 	app.Run(fmt.Sprintf(":%d", conf.Application.Port))
 }

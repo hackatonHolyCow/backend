@@ -20,14 +20,16 @@ func New(svc *service.Service, router *gin.RouterGroup) {
 
 	route := router.Group("/orders")
 	delivery.Create(route)
+	delivery.Get(route)
+	delivery.List(route)
 }
 
 func (o *OrdersDelivery) Create(route *gin.RouterGroup) {
 	route.POST("", func(c *gin.Context) {
-		var request entity.Order
+		var request entity.CreateOrderRequest
 		if err := c.Bind(&request); err != nil {
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"err,or": gin.H{
+				"error": gin.H{
 					"code":  http.StatusUnprocessableEntity,
 					"error": err.Error(),
 				},
@@ -39,7 +41,43 @@ func (o *OrdersDelivery) Create(route *gin.RouterGroup) {
 		response, err := o.service.Orders.Create(c, &request)
 		if err != nil {
 			c.JSON(errors.HTTPCode(err), gin.H{
-				"err,or": gin.H{
+				"error": gin.H{
+					"code":  errors.HTTPCode(err),
+					"error": err.Error(),
+				},
+			})
+
+			return
+		}
+
+		c.JSON(http.StatusOK, response)
+	})
+}
+
+func (o *OrdersDelivery) Get(route *gin.RouterGroup) {
+	route.GET("/:id", func(c *gin.Context) {
+		response, err := o.service.Orders.Get(c, c.Param("id"))
+		if err != nil {
+			c.JSON(errors.HTTPCode(err), gin.H{
+				"error": gin.H{
+					"code":  errors.HTTPCode(err),
+					"error": err.Error(),
+				},
+			})
+
+			return
+		}
+
+		c.JSON(http.StatusOK, response)
+	})
+}
+
+func (o *OrdersDelivery) List(route *gin.RouterGroup) {
+	route.GET("", func(c *gin.Context) {
+		response, err := o.service.Orders.List(c)
+		if err != nil {
+			c.JSON(errors.HTTPCode(err), gin.H{
+				"error": gin.H{
 					"code":  errors.HTTPCode(err),
 					"error": err.Error(),
 				},

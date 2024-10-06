@@ -11,6 +11,7 @@ type (
 	Config struct {
 		Application Application
 		Databases   Databases
+		MercadoPago MercadoPago
 	}
 
 	Application struct {
@@ -20,6 +21,10 @@ type (
 
 	Databases struct {
 		PostgresDSN string `env:"POSTGRES_DSN,required=true"`
+	}
+
+	MercadoPago struct {
+		Token string `env:"MP_ACCESS_TOKEN,required=true"`
 	}
 )
 

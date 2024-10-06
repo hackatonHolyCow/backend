@@ -15,7 +15,7 @@ func upCreateOrderItems(ctx context.Context, tx *sql.Tx) error {
 	// This code is executed when the migration is applied.
 	_, err := tx.ExecContext(ctx, `
 		CREATE TABLE IF NOT EXISTS order_items (
-			id text primary key not null,
+			id uuid primary key default gen_random_uuid(),
 			order_id uuid not null,
 			item_id uuid not null,
 			quantity int not null,

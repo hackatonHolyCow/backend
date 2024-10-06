@@ -15,7 +15,7 @@ func upCreateOrders(ctx context.Context, tx *sql.Tx) error {
 	// This code is executed when the migration is applied.
 	_, err := tx.ExecContext(ctx, `
 		CREATE TABLE IF NOT EXISTS orders (
-			id uuid primary key default gen_random_uuid(),
+			id text primary key not null,
 			total_amount bigint not null,
 			board text not null,
 			payment_id text not null
