@@ -82,7 +82,7 @@ func (o *OrdersRepositoryIplm) List(ctx context.Context) ([]*entity.Order, error
 						'description', i2.description,
 						'price', i2.price,
 						'tags', i2.tags,
-						'picture', i2.picture
+						'picture', i2.picture,
 						'quantity', oi2.quantity,
 						'comments', oi2.comments
 					))
